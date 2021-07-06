@@ -28,8 +28,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#FF5858'
   },
   btnRegisterText: {
-    color: '#eee',
-    textAlign: 'center'
+    color: '#FCECEC',
+    textAlign: 'center',
+    fontWeight: '100'
   },
 });
 
@@ -65,8 +66,8 @@ export default function Register() {
       <Text style={styles.heading}>Create New Account</Text>
       <InputField placeholder="Nama" onValueChange={(nama) => setNama(nama) }/>
       <InputField placeholder="Email"  onValueChange={(email) => setEmail(email) }/>
-      <InputField placeholder="Password" onValueChange={(password) => setPassword(password)} />
-      <InputField placeholder="Konfirmasi Password" onValueChange={(konfirmasiPassword) => setKonfirmasiPassword(konfirmasiPassword)}/>
+      <InputField placeholder="Password" secureTextEntry={true} onValueChange={(password) => setPassword(password)} />
+      <InputField placeholder="Konfirmasi Password" secureTextEntry={true} onValueChange={(konfirmasiPassword) => setKonfirmasiPassword(konfirmasiPassword)}/>
       <BloodTypePicker selectedValue={bloodType} onValueChange={(itemVal, itemIdx) => setBloodType(itemVal)} />
       <TouchableOpacity style={styles.btnRegister} onPress={onRegisterPressed}>
         <Text style={styles.btnRegisterText}>Daftar</Text>

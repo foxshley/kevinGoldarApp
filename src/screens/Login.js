@@ -23,11 +23,13 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 30,
     fontSize: 24,
-    fontWeight: '100'
+    fontWeight: '100',
+    color: '#535353'
   },
   description: {
     textAlign: 'center',
-    marginBottom: 20
+    marginBottom: 20,
+    color: '#938484'
   },
   btnLogin: {
     width: 300,
@@ -37,8 +39,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#FF5858'
   },
   btnLoginText: {
-    color: '#eee',
-    textAlign: 'center'
+    color: '#FCECEC',
+    textAlign: 'center',
+    fontWeight: '100'
   },
   register: {
     display: 'flex',
@@ -89,8 +92,8 @@ export default function Login({ navigation }) {
       <Logo />
       <Text style={styles.title}>Login</Text>
       <Text style={styles.description}>Silahkan masukkan email dan password anda</Text>
-      <InputField placeholder="Email" onChange={(email) => setEmail(email)} />
-      <InputField placeholder="Password" secureTextEntry={true} onChange={(password) => setPassword(password)}/>
+      <InputField placeholder="Email" autocompleteType="email" onChange={(email) => setEmail(email)} />
+      <InputField placeholder="Password" autocompleteType="password" secureTextEntry={true} onChange={(password) => setPassword(password)}/>
       <Pressable style={{ marginLeft: 'auto' }} onPress={onForgotPasswordPressed}>
         <Text style={{ color: '#FF5858' }}>Lupa Password?</Text>
       </Pressable>
@@ -98,7 +101,7 @@ export default function Login({ navigation }) {
         <Text style={styles.btnLoginText}>Login</Text>
       </TouchableOpacity>
       <View style={styles.register}>
-        <Text>Tidak punya akun?</Text>
+        <Text style={{color: '#535353'}}>Tidak punya akun?</Text>
         <Pressable onPress={onRegisterPressed}>
           <Text style={styles.btnRegister}>Daftar</Text>
         </Pressable>

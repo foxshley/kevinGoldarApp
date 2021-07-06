@@ -8,12 +8,12 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     paddingHorizontal: 20,
     borderRadius: 10,
-    backgroundColor: '#aaa'
+    backgroundColor: '#ECE6E6'
   }
 });
 
 const InputField = (props) => (
-    <TextInput {...props} style={styles.input} placeholderTextColor="#eee" />
+    <TextInput {...props} style={styles.input} placeholderTextColor="#535353" />
 );
 
 export default InputField;

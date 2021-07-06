@@ -9,14 +9,12 @@ const styles = StyleSheet.create({
     marginHorizontal: 'auto',
     marginBottom: 10,
     paddingHorizontal: 20,
-    borderWidth: 1,
-    borderRadius: 10,
-    backgroundColor: '#aaa'
+    borderRadius: 10
   }
 });
 
 const BloodTypePicker = (props) => (
-    <Picker {...props} style={styles.input}>
+    <Picker {...props} style={styles.input} backgroundColor="#ECE6E6">
       <Picker.Item label="-- Pilih Golongan Darah --" value="" />
       <Picker.Item label="A" value="A" />
       <Picker.Item label="B" value="B" />
