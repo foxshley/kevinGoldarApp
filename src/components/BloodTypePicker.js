@@ -16,10 +16,14 @@ const styles = StyleSheet.create({
 const BloodTypePicker = (props) => (
     <Picker {...props} style={styles.input} backgroundColor="#ECE6E6">
       <Picker.Item label="-- Pilih Golongan Darah --" value="" />
-      <Picker.Item label="A" value="A" />
-      <Picker.Item label="B" value="B" />
-      <Picker.Item label="AB" value="AB" />
-      <Picker.Item label="O" value="O" />
+      <Picker.Item label="A+" value="A+" />
+      <Picker.Item label="A-" value="A+" />
+      <Picker.Item label="B+" value="B+" />
+      <Picker.Item label="B-" value="B-" />
+      <Picker.Item label="AB+" value="AB+" />
+      <Picker.Item label="AB-" value="AB-" />
+      <Picker.Item label="O+" value="O+" />
+      <Picker.Item label="O-" value="O-" />
     </Picker>
 );
 
