@@ -3,9 +3,15 @@
  * @flow strict-local
  */
 
-import React, {useState, useContext} from 'react';
-import {Text, StyleSheet, TouchableOpacity} from 'react-native';
+import React, {useState} from 'react';
+import {
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ActivityIndicator,
+} from 'react-native';
 import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 
 import Container from '../components/Container';
 import InputField from '../components/InputField';
@@ -32,6 +38,7 @@ const styles = StyleSheet.create({
 });
 
 export default function Register() {
+  const [isRegistering, setIsRegistering] = useState(false);
   const [nama, setNama] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -40,6 +47,7 @@ export default function Register() {
   const [error, setError] = useState('');
 
   const onRegisterPressed = () => {
+    setIsRegistering(true);
     auth()
       .createUserWithEmailAndPassword(email, password)
       .then(cred => {
@@ -47,12 +55,13 @@ export default function Register() {
           displayName: nama,
         });
 
-        db.collection('users').doc(cred.user.uid).set({
+        firestore().collection('users').doc(cred.user.uid).set({
           bloodType: bloodType,
         });
       })
       .catch(error => {
         setError(error.message);
+        setIsRegistering(false);
       });
   };
 
@@ -78,7 +87,13 @@ export default function Register() {
         onValueChange={(itemVal, itemIdx) => setBloodType(itemVal)}
       />
       <TouchableOpacity style={styles.btnRegister} onPress={onRegisterPressed}>
-        <Text style={styles.btnRegisterText}>Daftar</Text>
+        <Text style={styles.btnRegisterText}>
+          {isRegistering ? (
+            <ActivityIndicator size="small" color="#0000ff" />
+          ) : (
+            'Daftar'
+          )}
+        </Text>
       </TouchableOpacity>
     </Container>
   );

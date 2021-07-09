@@ -10,7 +10,7 @@ import {
   Pressable,
   StyleSheet,
   TouchableOpacity,
-  Button,
+  ActivityIndicator,
 } from 'react-native';
 import auth from '@react-native-firebase/auth';
 
@@ -68,6 +68,7 @@ const styles = StyleSheet.create({
 const Logo = ({}) => <View style={styles.logo}></View>;
 
 export default function Login({navigation}) {
+  const [isLogginIn, setIsLogginIn] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -79,16 +80,14 @@ export default function Login({navigation}) {
   };
 
   const onLoginPressed = () => {
+    setIsLogginIn(true);
     auth()
       .signInWithEmailAndPassword(email, password)
       .catch(err => {
         setError(err.message);
+        setIsLogginIn(false);
       });
   };
-
-  useEffect(() => {
-    console.log(error);
-  }, [error]);
 
   return (
     <Container>
@@ -113,7 +112,13 @@ export default function Login({navigation}) {
         <Text style={{color: '#FF5858'}}>Lupa Password?</Text>
       </Pressable>
       <TouchableOpacity style={styles.btnLogin} onPress={onLoginPressed}>
-        <Text style={styles.btnLoginText}>Login</Text>
+        <Text style={styles.btnLoginText}>
+          {isLogginIn ? (
+            <ActivityIndicator size="small" color="#0000ff" />
+          ) : (
+            'Login'
+          )}
+        </Text>
       </TouchableOpacity>
       <View style={styles.register}>
         <Text style={{color: '#535353'}}>Tidak punya akun?</Text>
