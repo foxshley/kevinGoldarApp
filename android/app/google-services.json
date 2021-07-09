@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "32389790930",
+    "project_id": "kevin-goldar-app-f57cc",
+    "storage_bucket": "kevin-goldar-app-f57cc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:32389790930:android:7207a75fc6f9deaf3f010b",
+        "android_client_info": {
+          "package_name": "com.kevingoldarapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "32389790930-cc7cduekba5uvl9kialstg1amit5vi1t.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.kevingoldarapp",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "32389790930-1rlkcjfjva4e3pv553aladiphrrmolpc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAuRXafZoyFzNT_hrLNFwAobtJ0x5qPME8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "32389790930-1rlkcjfjva4e3pv553aladiphrrmolpc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
