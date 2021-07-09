@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Image, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import {View, Image, Text, TouchableOpacity, StyleSheet} from 'react-native';
 
 const styles = StyleSheet.create({
   container: {
@@ -8,16 +8,16 @@ const styles = StyleSheet.create({
     backgroundColor: '#eee',
     borderRadius: 10,
     paddingVertical: 15,
-    width: 250
+    width: 250,
   },
   avatar: {
     width: 50,
     height: 50,
     borderRadius: 50 / 2,
-    overflow: 'hidden'
+    overflow: 'hidden',
   },
   description: {
-    marginTop: 25
+    marginTop: 25,
   },
   actionButtonsContainer: {
     // flex: 1
@@ -25,40 +25,40 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#c3c3c3',
     marginTop: 20,
-    padding: 10
+    padding: 10,
   },
   btn: {
     width: 100,
     padding: 15,
     borderRadius: 20,
-    backgroundColor: '#FF5858'
+    backgroundColor: '#FF5858',
   },
   btnText: {
     color: '#FCECEC',
     textAlign: 'center',
-    fontWeight: '100'
+    fontWeight: '100',
   },
 });
 
-const Description = (props) => (
+const Description = props => (
   <View style={styles.description}>
     <Text>Golongan Darah: {props.donor.properties.bloodType}</Text>
   </View>
 );
 
-const MessageButton = (props) => (
+const MessageButton = props => (
   <TouchableOpacity {...props} style={styles.btn}>
     <Text style={styles.btnText}>Message</Text>
   </TouchableOpacity>
 );
 
-const NavigateButton = (props) => (
+const NavigateButton = props => (
   <TouchableOpacity {...props} style={styles.btn}>
     <Text style={styles.btnText}>Navigate</Text>
   </TouchableOpacity>
 );
 
-const ActionButtons = (props) => (
+const ActionButtons = props => (
   <View style={styles.actionButtonsContainer}>
     <MessageButton onPress={props.onMessagePress} />
     <NavigateButton onPress={props.onNavigatePress} />
@@ -67,10 +67,16 @@ const ActionButtons = (props) => (
 
 export default function DonorCalloutView(props) {
   return (
-    <TouchableOpacity style={styles.container} onPress={props.onPress}>
-      <Image source={{ uri: 'https://i.pravatar.cc/100' }} style={styles.avatar} />
+    <View style={styles.container}>
+      <Image
+        source={{uri: 'https://i.pravatar.cc/100'}}
+        style={styles.avatar}
+      />
       <Description donor={props.donor} />
-      <ActionButtons onMessagePress={props.onMessagePress} onNavigatePress={props.onNavigatePress} />
-    </TouchableOpacity>
+      <ActionButtons
+        onMessagePress={props.onMessagePress}
+        onNavigatePress={props.onNavigatePress}
+      />
+    </View>
   );
 }
