@@ -9,13 +9,19 @@ import auth from '@react-native-firebase/auth';
 
 import Container from '../components/Container';
 
+import AuthContext from '../contexts/AuthContext';
+
 const styles = StyleSheet.create({});
 
 export default function Home() {
   const [name, setName] = useState('');
 
+  const {signOut} = useContext(AuthContext);
+
   const logout = () => {
-    auth().signOut();
+    auth()
+      .signOut()
+      .then(() => signOut());
   };
 
   useEffect(() => {

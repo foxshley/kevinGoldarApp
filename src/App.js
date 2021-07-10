@@ -4,11 +4,13 @@
  */
 
 // @refresh reset
-import React, {useState, useEffect, useMemo} from 'react';
+import React, {useState, useEffect, useReducer, useMemo} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
 import auth from '@react-native-firebase/auth';
+
+import AuthContext from './contexts/AuthContext';
 
 import AuthScreen from './screens/Auth';
 import HomeScreen from './screens/Home';
@@ -36,6 +38,39 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [permissionGranted, setPermissionGranted] = useState(true);
+  const [state, dispatch] = useReducer(
+    (prevState, action) => {
+      switch (action.type) {
+        case 'SIGN_IN':
+          return {
+            ...prevState,
+            isSignedIn: true,
+          };
+        case 'SIGN_OUT':
+          return {
+            ...prevState,
+            isSignedIn: false,
+          };
+        case 'TOGGLE_LOADING':
+          return {
+            ...prevState,
+            isLoading: !prevState.isLoading,
+          };
+      }
+    },
+    {
+      isLoading: true,
+      isSignedIn: false,
+    },
+  );
+
+  const authContext = useMemo(
+    () => ({
+      signIn: () => dispatch({type: 'SIGN_IN'}),
+      signOut: () => dispatch({type: 'SIGN_OUT'}),
+    }),
+    [],
+  );
 
   const checkPermission = () => {
     check(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION).then(result => {
@@ -56,20 +91,26 @@ function App() {
   useEffect(() => {
     checkPermission();
 
-    const subscriber = auth().onAuthStateChanged(user => {
-      if (user) {
-        setUser(user);
-        if (isLoading) setIsLoading(false);
-      } else {
-        setUser(null);
-        if (isLoading) setIsLoading(false);
-      }
-    });
+    if (auth().currentUser) {
+      dispatch({type: 'SIGN_IN'});
+    }
 
-    return subscriber;
+    dispatch({type: 'TOGGLE_LOADING'});
+
+    // const subscriber = auth().onAuthStateChanged(user => {
+    //   if (user) {
+    //     setUser(user);
+    //     if (isLoading) setIsLoading(false);
+    //   } else {
+    //     setUser(null);
+    //     if (isLoading) setIsLoading(false);
+    //   }
+    // });
+
+    // return subscriber;
   }, []);
 
-  if (isLoading) {
+  if (state.isLoading) {
     return <SplashScreen />;
   }
 
@@ -78,9 +119,11 @@ function App() {
   }
 
   return (
-    <NavigationContainer>
-      {user ? <HomeScreen /> : <AuthScreen />}
-    </NavigationContainer>
+    <AuthContext.Provider value={authContext}>
+      <NavigationContainer>
+        {state.isSignedIn ? <HomeScreen /> : <AuthScreen />}
+      </NavigationContainer>
+    </AuthContext.Provider>
   );
 }
 

@@ -19,6 +19,8 @@ import Container from '../components/Container';
 import InputField from '../components/InputField';
 import FormInputField from '../components/FormInputField';
 
+import AuthContext from '../contexts/AuthContext';
+
 const styles = StyleSheet.create({
   logo: {
     backgroundColor: 'gray',
@@ -71,6 +73,7 @@ export default function Login({navigation}) {
   const [error, setError] = useState('');
 
   const formMethods = useForm();
+  const {signIn} = useContext(AuthContext);
 
   const onForgotPasswordPressed = () => {};
 
@@ -82,6 +85,9 @@ export default function Login({navigation}) {
     setIsLogginIn(true);
     auth()
       .signInWithEmailAndPassword(form.Email, form.Password)
+      .then(() => {
+        signIn();
+      })
       .catch(err => {
         setError(err.message);
         setIsLogginIn(false);
