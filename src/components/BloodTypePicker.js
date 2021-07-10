@@ -12,8 +12,11 @@ const styles = StyleSheet.create({
   },
 });
 
-const BloodTypePicker = props => (
-  <Picker {...props} style={styles.input} backgroundColor="#ECE6E6">
+const BloodTypePicker = ({isError, ...props}) => (
+  <Picker
+    {...props}
+    style={[styles.input, isError && {borderColor: '#FF5858', borderWidth: 1}]}
+    backgroundColor="#ECE6E6">
     <Picker.Item label="-- Pilih Golongan Darah --" value="" />
     <Picker.Item label="A+" value="A+" />
     <Picker.Item label="A-" value="A-" />
