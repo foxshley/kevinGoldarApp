@@ -68,8 +68,6 @@ const Logo = ({}) => <View style={styles.logo}></View>;
 
 export default function Login({navigation}) {
   const [isLogginIn, setIsLogginIn] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
   const formMethods = useForm();

@@ -47,11 +47,6 @@ const styles = StyleSheet.create({
 
 export default function Register() {
   const [isRegistering, setIsRegistering] = useState(false);
-  const [nama, setNama] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [konfirmasiPassword, setKonfirmasiPassword] = useState('');
-  const [bloodType, setBloodType] = useState('');
   const [error, setError] = useState('');
 
   const formMethods = useForm();
