@@ -12,12 +12,12 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
+import {FormProvider, useForm} from 'react-hook-form';
 import auth from '@react-native-firebase/auth';
 
 import Container from '../components/Container';
 import InputField from '../components/InputField';
-
-// const auth = firebase.auth();
+import FormInputField from '../components/FormInputField';
 
 const styles = StyleSheet.create({
   logo: {
@@ -61,7 +61,6 @@ const styles = StyleSheet.create({
   },
   loginError: {
     color: 'red',
-    textAlign: 'center',
   },
 });
 
@@ -73,45 +72,78 @@ export default function Login({navigation}) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
+  const formMethods = useForm();
+
   const onForgotPasswordPressed = () => {};
 
   const onRegisterPressed = () => {
     navigation.push('Register');
   };
 
-  const onLoginPressed = () => {
+  const onLoginPressed = form => {
     setIsLogginIn(true);
     auth()
-      .signInWithEmailAndPassword(email, password)
+      .signInWithEmailAndPassword(form.Email, form.Password)
       .catch(err => {
         setError(err.message);
         setIsLogginIn(false);
       });
   };
 
+  const onLoginError = form => {
+    // console.warn(form);
+  };
+
   return (
     <Container>
       <Logo />
       <Text style={styles.title}>Login</Text>
-      <Text style={styles.description}>
-        Silahkan masukkan email dan password anda
+      <Text style={[styles.description, error && styles.loginError]}>
+        {error ? error : 'Silahkan masukkan email dan password anda'}
       </Text>
-      <Text style={styles.loginError}>{error}</Text>
-      <InputField
-        placeholder="Email"
-        autocompleteType="email"
-        onChangeText={email => setEmail(email)}
-      />
-      <InputField
-        placeholder="Password"
-        autocompleteType="password"
-        secureTextEntry={true}
-        onChangeText={password => setPassword(password)}
-      />
-      <Pressable style={{marginLeft: 'auto'}} onPress={onForgotPasswordPressed}>
+      <Text style={styles.loginError}></Text>
+      <FormProvider {...formMethods}>
+        <FormInputField
+          name="Email"
+          placeholder="Email"
+          autocompleteType="email"
+          keyboardType="email-address"
+          returnKeyType="next"
+          returnKeyLabel="next"
+          // onChangeText={email => setEmail(email)}
+          rules={{
+            required: 'Email wajib diisi!',
+            pattern: {
+              value: /\S+@\S+\.\S+/,
+              message: 'Email tidak valid!',
+            },
+          }}
+        />
+        <FormInputField
+          name="Password"
+          placeholder="Password"
+          autocompleteType="password"
+          returnKeyType="go"
+          returnKeyLabel="go"
+          secureTextEntry={true}
+          // onChangeText={password => setPassword(password)}
+          rules={{
+            required: 'Password wajib diisi!',
+            minLength: {
+              message: 'Password terlalu pendek, minimal 6 karakter.',
+              value: 6,
+            },
+          }}
+        />
+      </FormProvider>
+      <Pressable
+        style={{marginLeft: 'auto', marginBottom: 20}}
+        onPress={onForgotPasswordPressed}>
         <Text style={{color: '#FF5858'}}>Lupa Password?</Text>
       </Pressable>
-      <TouchableOpacity style={styles.btnLogin} onPress={onLoginPressed}>
+      <TouchableOpacity
+        style={styles.btnLogin}
+        onPress={formMethods.handleSubmit(onLoginPressed, onLoginError)}>
         <Text style={styles.btnLoginText}>
           {isLogginIn ? (
             <ActivityIndicator size="small" color="#0000ff" />
