@@ -16,7 +16,6 @@ import {FormProvider, useForm} from 'react-hook-form';
 import auth from '@react-native-firebase/auth';
 
 import Container from '../components/Container';
-import InputField from '../components/InputField';
 import FormInputField from '../components/FormInputField';
 
 import AuthContext from '../contexts/AuthContext';

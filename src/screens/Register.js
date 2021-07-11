@@ -16,9 +16,7 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 
 import Container from '../components/Container';
-import InputField from '../components/InputField';
 import FormInputField from '../components/FormInputField';
-import BloodTypePicker from '../components/BloodTypePicker';
 import FormBloodTypePicker from '../components/FormBloodTypePicker';
 
 const styles = StyleSheet.create({
