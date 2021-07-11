@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function Register() {
+export default function Register({navigation}) {
   const [isRegistering, setIsRegistering] = useState(false);
   const [error, setError] = useState('');
 
@@ -60,9 +60,15 @@ export default function Register() {
           displayName: form.name,
         });
 
-        firestore().collection('users').doc(cred.user.uid).set({
-          bloodType: form.bloodType,
-        });
+        firestore()
+          .collection('users')
+          .doc(cred.user.uid)
+          .set({
+            bloodType: form.bloodType,
+          })
+          .then(() => {
+            navigation.push('UploadAvatar');
+          });
       })
       .catch(error => {
         setError(error.message);
