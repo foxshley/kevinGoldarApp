@@ -6,7 +6,7 @@ const styles = StyleSheet.create({
   input: {
     width: 300,
     marginHorizontal: 'auto',
-    marginBottom: 10,
+    // marginBottom: 10,
     paddingHorizontal: 20,
     borderRadius: 10,
   },

@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
   },
   btnRegister: {
     width: 300,
-    marginTop: 20,
+    marginTop: 'auto',
     padding: 15,
     borderRadius: 20,
     backgroundColor: '#FF5858',
