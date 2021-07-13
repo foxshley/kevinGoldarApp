@@ -4,7 +4,9 @@
  */
 
 import React from 'react';
-import {View, Text, StyleSheet, ActivityIndicator} from 'react-native';
+import {View, Image, StyleSheet, useWindowDimensions} from 'react-native';
+
+import Logo from '../assets/logo.png';
 
 const styles = StyleSheet.create({
   splash: {
@@ -15,9 +17,10 @@ const styles = StyleSheet.create({
 });
 
 export default function Splash() {
+  const {width, height} = useWindowDimensions();
   return (
     <View style={styles.splash}>
-      <Text>Loading...</Text>
+      <Image source={Logo} style={{width: width / 2, height: height / 2}} />
     </View>
   );
 }

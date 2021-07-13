@@ -8,6 +8,7 @@ import React, {useState, useEffect, useReducer, useMemo} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import auth from '@react-native-firebase/auth';
 
 import AuthContext from './contexts/AuthContext';
@@ -15,6 +16,7 @@ import AuthContext from './contexts/AuthContext';
 import AuthScreen from './screens/Auth';
 import HomeScreen from './screens/Home';
 import SplashScreen from './screens/Splash';
+import OnboardingScreen from './screens/Onboarding';
 
 const styles = StyleSheet.create({
   permissionError: {
@@ -35,7 +37,7 @@ const PermissionError = () => (
 );
 
 function App() {
-  const [isLoading, setIsLoading] = useState(true);
+  const [isFirstTime, setIsFirstTime] = useState(true);
   const [user, setUser] = useState(null);
   const [permissionGranted, setPermissionGranted] = useState(true);
   const [state, dispatch] = useReducer(
@@ -56,10 +58,16 @@ function App() {
             ...prevState,
             isLoading: !prevState.isLoading,
           };
+        case 'TOGGLE_FIRST_TIME':
+          return {
+            ...prevState,
+            isFirstTime: !prevState.isFirstTime,
+          };
       }
     },
     {
       isLoading: true,
+      isFirstTime: true,
       isSignedIn: false,
     },
   );
@@ -88,14 +96,26 @@ function App() {
     });
   };
 
+  const checkFirstTime = async () => {
+    const firstTime = await AsyncStorage.getItem('firstTime');
+
+    if (firstTime !== null) {
+      console.log(firstTime);
+      dispatch({type: 'TOGGLE_FIRST_TIME'});
+    } else {
+      // await AsyncStorage.setItem('firstTime', 'check');
+    }
+  };
+
   useEffect(() => {
     checkPermission();
+    checkFirstTime();
 
     if (auth().currentUser) {
       dispatch({type: 'SIGN_IN'});
     }
 
-    dispatch({type: 'TOGGLE_LOADING'});
+    setTimeout(() => dispatch({type: 'TOGGLE_LOADING'}), 2000);
 
     // const subscriber = auth().onAuthStateChanged(user => {
     //   if (user) {
@@ -116,6 +136,10 @@ function App() {
 
   if (!permissionGranted) {
     return <PermissionError />;
+  }
+
+  if (isFirstTime) {
+    return <OnboardingScreen />;
   }
 
   return (

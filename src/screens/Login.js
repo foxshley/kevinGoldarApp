@@ -99,7 +99,6 @@ export default function Login({navigation}) {
 
   return (
     <Container>
-      <Logo />
       <Text style={styles.title}>Login</Text>
       <Text style={[styles.description, error && styles.loginError]}>
         {error ? error : 'Silahkan masukkan email dan password anda'}
