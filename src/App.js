@@ -16,7 +16,6 @@ import AuthContext from './contexts/AuthContext';
 import AuthScreen from './screens/Auth';
 import HomeScreen from './screens/Home';
 import SplashScreen from './screens/Splash';
-import OnboardingScreen from './screens/Onboarding';
 
 const styles = StyleSheet.create({
   permissionError: {
@@ -37,8 +36,9 @@ const PermissionError = () => (
 );
 
 function App() {
-  const [isFirstTime, setIsFirstTime] = useState(true);
   const [user, setUser] = useState(null);
+  const [isSignedIn, setIsSignedIn] = useState(false);
+  const [isFirstTime, setIsFirstTime] = useState(true);
   const [permissionGranted, setPermissionGranted] = useState(true);
   const [state, dispatch] = useReducer(
     (prevState, action) => {
@@ -58,16 +58,10 @@ function App() {
             ...prevState,
             isLoading: !prevState.isLoading,
           };
-        case 'TOGGLE_FIRST_TIME':
-          return {
-            ...prevState,
-            isFirstTime: !prevState.isFirstTime,
-          };
       }
     },
     {
       isLoading: true,
-      isFirstTime: true,
       isSignedIn: false,
     },
   );
@@ -76,8 +70,12 @@ function App() {
     () => ({
       signIn: () => dispatch({type: 'SIGN_IN'}),
       signOut: () => dispatch({type: 'SIGN_OUT'}),
+      isSignedIn,
+      setIsSignedIn,
+      isFirstTime,
+      setIsFirstTime,
     }),
-    [],
+    [isSignedIn, isFirstTime],
   );
 
   const checkPermission = () => {
@@ -100,10 +98,7 @@ function App() {
     const firstTime = await AsyncStorage.getItem('firstTime');
 
     if (firstTime !== null) {
-      console.log(firstTime);
-      dispatch({type: 'TOGGLE_FIRST_TIME'});
-    } else {
-      // await AsyncStorage.setItem('firstTime', 'check');
+      setIsFirstTime(false);
     }
   };
 
@@ -136,10 +131,6 @@ function App() {
 
   if (!permissionGranted) {
     return <PermissionError />;
-  }
-
-  if (isFirstTime) {
-    return <OnboardingScreen />;
   }
 
   return (
