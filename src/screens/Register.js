@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
   },
   btnRegister: {
     width: 300,
-    marginTop: 'auto',
+    marginTop: 20,
     padding: 15,
     borderRadius: 20,
     backgroundColor: '#FF5858',
@@ -65,7 +65,7 @@ export default function Register({navigation}) {
             bloodType: form.bloodType,
           })
           .then(() => {
-            navigation.push('UploadAvatar');
+            navigation.push('RoleChoose');
           });
       })
       .catch(error => {

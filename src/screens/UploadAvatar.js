@@ -113,7 +113,7 @@ export default function UploadAvatar({navigation}) {
               })
               .then(() => {
                 setIsUploading(false);
-                signIn();
+                navigation.push('RegisterSuccess');
               })
               .catch(err => {
                 setError(err.message);
@@ -125,7 +125,7 @@ export default function UploadAvatar({navigation}) {
   };
 
   const onHandleSkip = () => {
-    signIn();
+    navigation.push('RegisterSuccess');
   };
 
   return (
