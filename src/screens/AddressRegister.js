@@ -94,6 +94,7 @@ export default function UploadAvatar({navigation}) {
           geohash: geohash,
           lat: selectedCoordinate[1],
           lng: selectedCoordinate[0],
+          active: true,
         },
       })
       .then(() => {

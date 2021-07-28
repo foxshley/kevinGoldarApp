@@ -4,9 +4,14 @@
  */
 
 import React, {useState, useEffect} from 'react';
-import {View, Text, StyleSheet, Button} from 'react-native';
+import {View, Text, StyleSheet, ActivityIndicator} from 'react-native';
 import MapboxGL from '@react-native-mapbox-gl/maps';
 import Geolocation from '@react-native-community/geolocation';
+
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
+
+import {geohashQueryBounds, distanceBetween} from 'geofire-common';
 
 import DonorCalloutView from '../components/DonorCalloutView';
 
@@ -26,6 +31,13 @@ MapboxGL.setAccessToken(
 const styles = StyleSheet.create({
   map: {
     flex: 1,
+  },
+  loadingIndicator: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    padding: 20,
+    zIndex: 99,
   },
 });
 
@@ -80,116 +92,101 @@ const symbolStyles = {
   },
 };
 
-const geoJsonData = {
-  type: 'FeatureCollection',
-  features: [
-    {
-      type: 'Feature',
-      id: '6cd3ee33-e40a-4bb9-b960-7c6891f380de',
-      properties: {
-        icon: 'b-plus',
-        bloodType: 'B+',
-      },
-      geometry: {
-        type: 'Point',
-        coordinates: [107.8481798, -6.9958435],
-      },
-    },
-    {
-      type: 'Feature',
-      id: 'debd420d-b7bf-4dd1-b468-9d936a369ab5',
-      properties: {
-        icon: 'a-minus',
-        bloodType: 'A-',
-      },
-      geometry: {
-        type: 'Point',
-        coordinates: [107.8499796, -6.9958222],
-      },
-    },
-    {
-      type: 'Feature',
-      id: 'dbd8ac7b-9213-4fc3-aa11-abbda99405a0',
-      properties: {
-        icon: 'o-plus',
-        bloodType: 'O+',
-      },
-      geometry: {
-        type: 'Point',
-        coordinates: [107.8494556, -6.9965806],
-      },
-    },
-    {
-      type: 'Feature',
-      id: '57b9d303-288c-4a98-ab2e-85e5643fa99d',
-      properties: {
-        icon: 'a-plus',
-        bloodType: 'A+',
-      },
-      geometry: {
-        type: 'Point',
-        coordinates: [107.83874, -6.98624],
-      },
-    },
-    {
-      type: 'Feature',
-      id: '87e8c881-5744-412e-908b-bee0991b5933',
-      properties: {
-        icon: 'a-plus',
-        bloodType: 'A+',
-      },
-      geometry: {
-        type: 'Point',
-        coordinates: [107.84874, -6.98424],
-      },
-    },
-    {
-      type: 'Feature',
-      id: '8798c02b-e954-481b-adc8-d9be52055004',
-      properties: {
-        icon: 'a-plus',
-        bloodType: 'A+',
-      },
-      geometry: {
-        type: 'Point',
-        coordinates: [107.6312114, -6.891806],
-      },
-    },
-    {
-      type: 'Feature',
-      id: '2e83a080-9e75-46be-840d-4d9d67598014',
-      properties: {
-        icon: 'b-plus',
-        bloodType: 'B+',
-      },
-      geometry: {
-        type: 'Point',
-        coordinates: [107.6271781, -6.8910423],
-      },
-    },
-    {
-      type: 'Feature',
-      id: 'f23a8ade-af4f-480b-9593-95569248ec60',
-      properties: {
-        icon: 'o-minus',
-        bloodType: 'O-',
-      },
-      geometry: {
-        type: 'Point',
-        coordinates: [107.6107428, -6.9175167],
-      },
-    },
-  ],
-};
-
 export default function Map({navigation}) {
-  const [donorsSource, setDonorsSource] = useState();
+  const [donorsSource, setDonorsSource] = useState({
+    type: 'FeatureCollection',
+    features: [],
+  });
   const [selectedDonor, setSelectedDonor] = useState();
   const [currentPos, setCurrentPos] = useState([]);
+  const [isDataFetched, setIsDataFetched] = useState(false);
   const [watchPosID, setWatchPosID] = useState(null);
 
-  const fetchDonors = () => {
-    setDonorsSource(geoJsonData);
+  const getBloodTypeIcon = bloodType => {
+    switch (bloodType) {
+      case 'A+':
+        return 'a-plus';
+      case 'A-':
+        return 'a-minus';
+      case 'B+':
+        return 'b-plus';
+      case 'B-':
+        return 'b-minus';
+      case 'AB+':
+        return 'ab-plus';
+      case 'AB-':
+        return 'ab-minus';
+      case 'O+':
+        return 'o-plus';
+      case 'O-':
+        return 'o-minus';
+      default:
+        break;
+    }
+
+    return null;
+  };
+
+  const fetchDonors = async () => {
+    // Find cities within 50km of London
+    const center = [...currentPos].reverse();
+    const radiusInM = 25 * 1000;
+
+    // Each item in 'bounds' represents a startAt/endAt pair. We have to issue
+    // a separate query for each pair. There can be up to 9 pairs of bounds
+    // depending on overlap, but in most cases there are 4.
+    const bounds = geohashQueryBounds(center, radiusInM);
+
+    const snapshots = [];
+
+    for (const b of bounds) {
+      const q = firestore()
+        .collection('users')
+        .where('geodata.active', '==', true)
+        .orderBy('geodata.geohash')
+        .startAt(b[0])
+        .endAt(b[1]);
+
+      snapshots.push(q.get());
+    }
+
+    Promise.all(snapshots).then(snaps => {
+      // Collect all the query results together into a single list
+      const geoJson = {
+        type: 'FeatureCollection',
+        features: [],
+      };
+
+      for (const snap of snaps) {
+        for (const doc of snap.docs) {
+          let docData = doc.data();
+          const lat = docData.geodata.lat;
+          const lng = docData.geodata.lng;
+          console.log('Lat: ' + lat + ', Lng: ' + lng);
+          // We have to filter out a few false positives due to GeoHash
+          // accuracy, but most will match
+          const distanceInKm = distanceBetween([lat, lng], center);
+          const distanceInM = distanceInKm * 1000;
+          if (distanceInM <= radiusInM) {
+            geoJson.features.push({
+              type: 'Feature',
+              id: doc.id,
+              properties: {
+                icon: getBloodTypeIcon(docData.bloodType),
+                bloodType: docData.bloodType,
+              },
+              geometry: {
+                type: 'Point',
+                coordinates: [docData.geodata.lng, docData.geodata.lat],
+              },
+            });
+          }
+        }
+      }
+
+      setDonorsSource(geoJson);
+      setIsDataFetched(true);
+    });
   };
 
   const onPinPress = e => {
@@ -207,7 +204,6 @@ export default function Map({navigation}) {
 
   useEffect(() => {
     MapboxGL.locationManager.start();
-    fetchDonors();
 
     Geolocation.getCurrentPosition(info => {
       setCurrentPos([info.coords.longitude, info.coords.latitude]);
@@ -224,74 +220,89 @@ export default function Map({navigation}) {
     };
   }, []);
 
+  useEffect(() => {
+    if (!(currentPos.length === 0)) {
+      if (!isDataFetched) fetchDonors();
+    }
+  }, [currentPos]);
+
   return (
-    <MapboxGL.MapView
-      style={styles.map}
-      styleURL={MapboxGL.StyleURL.Street}
-      onPress={onMapPress}>
-      <MapboxGL.Camera zoomLevel={12} followUserLocation={true} />
-      <MapboxGL.UserLocation />
-      <MapboxGL.ShapeSource
-        id="mapDonorSource"
-        shape={donorsSource}
-        onPress={onPinPress}>
-        <MapboxGL.SymbolLayer
-          id="map-donor-layer-a-plus"
-          style={symbolStyles.bloodAPlusStyle}
-          filter={['==', 'icon', 'a-plus']}
+    <View style={{flex: 1}}>
+      {!isDataFetched && (
+        <ActivityIndicator
+          style={styles.loadingIndicator}
+          size="small"
+          color="#0000ff"
         />
-        <MapboxGL.SymbolLayer
-          id="map-donor-layer-b-plus"
-          style={symbolStyles.bloodBPlusStyle}
-          filter={['==', 'icon', 'b-plus']}
-        />
-        <MapboxGL.SymbolLayer
-          id="map-donor-layer-ab-plus"
-          style={symbolStyles.bloodABPlusStyle}
-          filter={['==', 'icon', 'ab-plus']}
-        />
-        <MapboxGL.SymbolLayer
-          id="map-donor-layer-o-plus"
-          style={symbolStyles.bloodOPlusStyle}
-          filter={['==', 'icon', 'o-plus']}
-        />
-        <MapboxGL.SymbolLayer
-          id="map-donor-layer-a-minus"
-          style={symbolStyles.bloodAMinusStyle}
-          filter={['==', 'icon', 'a-minus']}
-        />
-        <MapboxGL.SymbolLayer
-          id="map-donor-layer-b-minus"
-          style={symbolStyles.bloodBMinusStyle}
-          filter={['==', 'icon', 'b-minus']}
-        />
-        <MapboxGL.SymbolLayer
-          id="map-donor-layer-ab-minus"
-          style={symbolStyles.bloodABMinusStyle}
-          filter={['==', 'icon', 'ab-minus']}
-        />
-        <MapboxGL.SymbolLayer
-          id="map-donor-layer-o-minus"
-          style={symbolStyles.bloodOMinusStyle}
-          filter={['==', 'icon', 'o-minus']}
-        />
-      </MapboxGL.ShapeSource>
-      {selectedDonor && (
-        <MapboxGL.MarkerView
-          id="selectedDonorMarkerView"
-          coordinate={selectedDonor.geometry.coordinates}>
-          <DonorCalloutView
-            donor={selectedDonor}
-            onMessagePress={() => {}}
-            onNavigatePress={() => {
-              navigation.push('Navigation', {
-                donor: selectedDonor,
-                currentPos: currentPos,
-              });
-            }}
-          />
-        </MapboxGL.MarkerView>
       )}
-    </MapboxGL.MapView>
+      <MapboxGL.MapView
+        style={styles.map}
+        styleURL={MapboxGL.StyleURL.Street}
+        onPress={onMapPress}>
+        <MapboxGL.Camera zoomLevel={12} followUserLocation={true} />
+        <MapboxGL.UserLocation />
+        <MapboxGL.ShapeSource
+          id="mapDonorSource"
+          shape={donorsSource}
+          onPress={onPinPress}>
+          <MapboxGL.SymbolLayer
+            id="map-donor-layer-a-plus"
+            style={symbolStyles.bloodAPlusStyle}
+            filter={['==', 'icon', 'a-plus']}
+          />
+          <MapboxGL.SymbolLayer
+            id="map-donor-layer-b-plus"
+            style={symbolStyles.bloodBPlusStyle}
+            filter={['==', 'icon', 'b-plus']}
+          />
+          <MapboxGL.SymbolLayer
+            id="map-donor-layer-ab-plus"
+            style={symbolStyles.bloodABPlusStyle}
+            filter={['==', 'icon', 'ab-plus']}
+          />
+          <MapboxGL.SymbolLayer
+            id="map-donor-layer-o-plus"
+            style={symbolStyles.bloodOPlusStyle}
+            filter={['==', 'icon', 'o-plus']}
+          />
+          <MapboxGL.SymbolLayer
+            id="map-donor-layer-a-minus"
+            style={symbolStyles.bloodAMinusStyle}
+            filter={['==', 'icon', 'a-minus']}
+          />
+          <MapboxGL.SymbolLayer
+            id="map-donor-layer-b-minus"
+            style={symbolStyles.bloodBMinusStyle}
+            filter={['==', 'icon', 'b-minus']}
+          />
+          <MapboxGL.SymbolLayer
+            id="map-donor-layer-ab-minus"
+            style={symbolStyles.bloodABMinusStyle}
+            filter={['==', 'icon', 'ab-minus']}
+          />
+          <MapboxGL.SymbolLayer
+            id="map-donor-layer-o-minus"
+            style={symbolStyles.bloodOMinusStyle}
+            filter={['==', 'icon', 'o-minus']}
+          />
+        </MapboxGL.ShapeSource>
+        {selectedDonor && (
+          <MapboxGL.MarkerView
+            id="selectedDonorMarkerView"
+            coordinate={selectedDonor.geometry.coordinates}>
+            <DonorCalloutView
+              donor={selectedDonor}
+              onMessagePress={() => {}}
+              onNavigatePress={() => {
+                navigation.push('Navigation', {
+                  donor: selectedDonor,
+                  currentPos: currentPos,
+                });
+              }}
+            />
+          </MapboxGL.MarkerView>
+        )}
+      </MapboxGL.MapView>
+    </View>
   );
 }
