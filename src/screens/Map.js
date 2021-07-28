@@ -173,6 +173,8 @@ export default function Map({navigation}) {
               id: doc.id,
               properties: {
                 icon: getBloodTypeIcon(docData.bloodType),
+                name: docData.name,
+                address: docData.address,
                 bloodType: docData.bloodType,
               },
               geometry: {

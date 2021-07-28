@@ -62,6 +62,8 @@ export default function Register({navigation}) {
           .collection('users')
           .doc(cred.user.uid)
           .set({
+            name: form.name,
+            email: form.email,
             bloodType: form.bloodType,
           })
           .then(() => {

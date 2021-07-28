@@ -1,5 +1,8 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {View, Image, Text, TouchableOpacity, StyleSheet} from 'react-native';
+import storage from '@react-native-firebase/storage';
+
+import PersonImg from '../assets/person.png';
 
 const styles = StyleSheet.create({
   container: {
@@ -38,16 +41,27 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontWeight: '100',
   },
+  name: {
+    fontSize: 16,
+    fontWeight: '700',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  address: {
+    fontStyle: 'italic',
+  },
 });
 
 const Description = props => (
   <View style={styles.description}>
+    <Text style={styles.name}>{props.donor.properties.name}</Text>
+    <Text style={styles.address}>{props.donor.properties.address}</Text>
     <Text>Golongan Darah: {props.donor.properties.bloodType}</Text>
   </View>
 );
 
 const MessageButton = props => (
-  <TouchableOpacity {...props} style={styles.btn}>
+  <TouchableOpacity {...props} style={[styles.btn, {marginRight: 5}]}>
     <Text style={styles.btnText}>Message</Text>
   </TouchableOpacity>
 );
@@ -66,12 +80,29 @@ const ActionButtons = props => (
 );
 
 export default function DonorCalloutView(props) {
+  const [avatarUrl, setAvatarUrl] = useState(null);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const url = await storage()
+          .ref('avatar/' + props.donor.id)
+          .getDownloadURL();
+
+        setAvatarUrl(url);
+      } catch (e) {
+        // console.error(e);
+      }
+    })();
+  }, []);
+
   return (
     <View style={styles.container}>
-      <Image
-        source={{uri: 'https://i.pravatar.cc/100'}}
-        style={styles.avatar}
-      />
+      {avatarUrl ? (
+        <Image source={{uri: avatarUrl}} style={styles.avatar} />
+      ) : (
+        <Image source={PersonImg} style={styles.avatar} />
+      )}
       <Description donor={props.donor} />
       <ActionButtons
         onMessagePress={props.onMessagePress}
