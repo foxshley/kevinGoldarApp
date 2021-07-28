@@ -162,7 +162,7 @@ export default function Map({navigation}) {
           let docData = doc.data();
           const lat = docData.geodata.lat;
           const lng = docData.geodata.lng;
-          console.log('Lat: ' + lat + ', Lng: ' + lng);
+          // console.log('Lat: ' + lat + ', Lng: ' + lng);
           // We have to filter out a few false positives due to GeoHash
           // accuracy, but most will match
           const distanceInKm = distanceBetween([lat, lng], center);
