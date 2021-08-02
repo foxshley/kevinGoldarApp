@@ -3,42 +3,64 @@
  * @flow strict-local
  */
 
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { createStackNavigator } from '@react-navigation/stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import React, {useState, useEffect} from 'react';
+import {View, Text, StyleSheet} from 'react-native';
+import {createStackNavigator} from '@react-navigation/stack';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-import Map from './Map';
-import Navigation from './Navigation';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
+
+import MapScreen from './Map';
+import NavigationScreen from './Navigation';
+import MessagesScreen from './Messages';
+import MessagesChat from './MessagesChat';
 import ProfileScreen from './Profile';
 
-const Tab = createBottomTabNavigator();
-const MapStack = createStackNavigator();
+const HomeStack = createStackNavigator();
+const TabStack = createBottomTabNavigator();
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create({});
 
-});
+const TabStackScreen = () => {
+  const [unreadMessages, setUnreadMessages] = useState(false);
 
-const MapStackScreen = () => (
-  <MapStack.Navigator screenOptions={{ headerShown: false }}>
-    <MapStack.Screen name="Map" component={Map} />
-    <MapStack.Screen name="Navigation" component={Navigation} />
-  </MapStack.Navigator>
-);
+  useEffect(() => {
+    let snapshot = null;
+    (async () => {
+      const uid = auth().currentUser.uid;
 
-export default function Home() {
+      try {
+        snapshot = await firestore()
+          .collection('lastMessages')
+          .doc(uid)
+          .collection('messages')
+          .where('unread', '==', true)
+          .onSnapshot(snapshot => {
+            if (!snapshot.empty) setUnreadMessages(true);
+            else setUnreadMessages(false);
+          });
+      } catch (err) {
+        console.error(err);
+      }
+    })();
+
+    return () => {
+      if (snapshot) return snapshot;
+    };
+  }, []);
 
   return (
-    <Tab.Navigator 
-      screenOptions={({ route }) => ({
-        tabBarIcon: ({ focused, color, size }) => {
+    <TabStack.Navigator
+      screenOptions={({route}) => ({
+        tabBarIcon: ({focused, color, size}) => {
           let iconName;
 
           if (route.name === 'Home') {
-            iconName = focused
-              ? 'home'
-              : 'home-outline';
+            iconName = focused ? 'home' : 'home-outline';
+          } else if (route.name === 'Messages') {
+            iconName = focused ? 'chatbubble' : 'chatbubble-outline';
           } else if (route.name === 'Profile') {
             iconName = focused ? 'person' : 'person-outline';
           }
@@ -49,10 +71,29 @@ export default function Home() {
       tabBarOptions={{
         activeTintColor: 'tomato',
         inactiveTintColor: 'gray',
-        showLabel: false
+        showLabel: false,
       }}>
-      <Tab.Screen name="Home" component={MapStackScreen} />
-      <Tab.Screen name="Profile" component={ProfileScreen} />
-    </Tab.Navigator>
+      <TabStack.Screen name="Home" component={MapScreen} />
+      <TabStack.Screen
+        name="Messages"
+        component={MessagesScreen}
+        options={unreadMessages ? {tabBarBadge: ' '} : {tabBarBadge: null}}
+      />
+      <TabStack.Screen name="Profile" component={ProfileScreen} />
+    </TabStack.Navigator>
   );
 };
+
+export default function Home() {
+  return (
+    <HomeStack.Navigator screenOptions={{headerShown: false}}>
+      <HomeStack.Screen name="MainMenu" component={TabStackScreen} />
+      <HomeStack.Screen name="Navigation" component={NavigationScreen} />
+      <HomeStack.Screen
+        name="MessagesChat"
+        component={MessagesChat}
+        options={{headerShown: true}}
+      />
+    </HomeStack.Navigator>
+  );
+}

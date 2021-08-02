@@ -145,7 +145,8 @@ export default function Login({navigation}) {
       </Pressable>
       <TouchableOpacity
         style={styles.btnLogin}
-        onPress={formMethods.handleSubmit(onLoginPressed, onLoginError)}>
+        onPress={formMethods.handleSubmit(onLoginPressed, onLoginError)}
+        disabled={isLogginIn}>
         <Text style={styles.btnLoginText}>
           {isLogginIn ? (
             <ActivityIndicator size="small" color="#0000ff" />

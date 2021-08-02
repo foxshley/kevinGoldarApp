@@ -294,9 +294,23 @@ export default function Map({navigation}) {
             coordinate={selectedDonor.geometry.coordinates}>
             <DonorCalloutView
               donor={selectedDonor}
-              onMessagePress={() => {}}
+              onMessagePress={() => {
+                // navigation.reset({
+                //   index: 1,
+                //   routes: [
+                //     {name: 'Messages'},
+                //     {
+                //       name: 'MessagesChat',
+                //       params: {recipientId: selectedDonor.id},
+                //     },
+                //   ],
+                // });
+                navigation.navigate('MessagesChat', {
+                  recipientId: selectedDonor.id,
+                });
+              }}
               onNavigatePress={() => {
-                navigation.push('Navigation', {
+                navigation.navigate('Navigation', {
                   donor: selectedDonor,
                   currentPos: currentPos,
                 });
