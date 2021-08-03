@@ -13,14 +13,17 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: '#d13636',
   },
 });
 
 export default function Splash() {
-  const {width, height} = useWindowDimensions();
   return (
     <View style={styles.splash}>
-      <Image source={Logo} style={{width: width / 2, height: height / 2}} />
+      <Image
+        source={Logo}
+        style={{width: 200, height: 200, borderRadius: 100}}
+      />
     </View>
   );
 }
