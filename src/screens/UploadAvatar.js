@@ -20,8 +20,6 @@ import storage from '@react-native-firebase/storage';
 import PersonImg from '../assets/person.png';
 import Container from '../components/Container';
 
-import AuthContext from '../contexts/AuthContext';
-
 const styles = StyleSheet.create({
   heading: {
     fontSize: 24,
@@ -67,8 +65,6 @@ export default function UploadAvatar({navigation}) {
   const [photo, setPhoto] = useState(null);
   const [error, setError] = useState('');
 
-  const {signIn} = useContext(AuthContext);
-
   const checkStoragePermission = async () => {
     let permissionGranted = false;
 
@@ -87,6 +83,18 @@ export default function UploadAvatar({navigation}) {
     });
 
     return permissionGranted;
+  };
+
+  const setDefaultAvatar = async () => {
+    try {
+      const url = await storage().ref('avatar/person.png').getDownloadURL();
+
+      await auth().currentUser.updateProfile({
+        photoURL: url,
+      });
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const onHandleChoosePhoto = async () => {
@@ -125,6 +133,7 @@ export default function UploadAvatar({navigation}) {
   };
 
   const onHandleSkip = () => {
+    setDefaultAvatar();
     navigation.push('RegisterSuccess');
   };
 
