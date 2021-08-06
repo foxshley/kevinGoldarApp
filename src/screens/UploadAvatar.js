@@ -11,8 +11,8 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
-import {launchImageLibrary} from 'react-native-image-picker';
 import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
+import ImagePicker from 'react-native-image-crop-picker';
 
 import auth from '@react-native-firebase/auth';
 import storage from '@react-native-firebase/storage';
@@ -99,36 +99,36 @@ export default function UploadAvatar({navigation}) {
 
   const onHandleChoosePhoto = async () => {
     if (checkStoragePermission()) {
-      launchImageLibrary(
-        {mediaType: 'photo', maxWidth: 1000, maxHeight: 1000},
-        async response => {
-          if (!response.didCancel) {
-            setIsUploading(true);
-            const uid = auth().currentUser.uid;
-            const uploadUri = response.assets[0].uri;
-            const photoRef = storage().ref('avatar/' + uid);
+      try {
+        const image = await ImagePicker.openPicker({
+          width: 500,
+          height: 500,
+          cropping: true,
+          cropperCircleOverlay: true,
+        });
 
-            setPhoto(uploadUri);
-            await photoRef.putFile(uploadUri);
+        setIsUploading(true);
 
-            const url = await storage()
-              .ref('avatar/' + uid)
-              .getDownloadURL();
+        const uid = auth().currentUser.uid;
+        const uploadUri = image.path;
+        const photoRef = storage().ref('avatar/' + uid);
 
-            auth()
-              .currentUser.updateProfile({
-                photoURL: url,
-              })
-              .then(() => {
-                setIsUploading(false);
-                navigation.push('RegisterSuccess');
-              })
-              .catch(err => {
-                setError(err.message);
-              });
-          }
-        },
-      );
+        setPhoto(uploadUri);
+        await photoRef.putFile(uploadUri);
+
+        const remoteUrl = await storage()
+          .ref('avatar/' + uid)
+          .getDownloadURL();
+
+        await auth().currentUser.updateProfile({
+          photoURL: remoteUrl,
+        });
+
+        setIsUploading(false);
+        navigation.push('RegisterSuccess');
+      } catch (err) {
+        console.error(err);
+      }
     }
   };
 
