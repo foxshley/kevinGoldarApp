@@ -22,10 +22,39 @@ import LogoutScreen from './Logout';
 const HomeStack = createStackNavigator();
 const TabStack = createBottomTabNavigator();
 
+import PushNotification from 'react-native-push-notification';
+
+// Must be outside of any component LifeCycle (such as `componentDidMount`).
+PushNotification.configure({
+  // Should the initial notification be popped automatically
+  // default: true
+  popInitialNotification: true,
+
+  /**
+   * (optional) default: true
+   * - Specified if permissions (ios) and token (android and ios) will requested or not,
+   * - if not, you must call PushNotificationsHandler.requestPermissions() later
+   * - if you are not using remote notification or do not have Firebase installed, use this:
+   *     requestPermissions: Platform.OS === 'ios'
+   */
+  requestPermissions: true,
+});
+
 const styles = StyleSheet.create({});
 
 const TabStackScreen = () => {
   const [unreadMessages, setUnreadMessages] = useState(false);
+
+  const createMessageNotificationChannel = () => {
+    PushNotification.createChannel({
+      channelId: 'msg-ch',
+      channelName: 'Message Notification Channel',
+    });
+  };
+
+  const deleteMessageNotificationChannel = () => {
+    PushNotification.deleteChannel('msg-ch');
+  };
 
   const checkUnreadMessages = async () => {
     const uid = auth().currentUser.uid;
@@ -38,8 +67,28 @@ const TabStackScreen = () => {
         .collection('messages')
         .where('unread', '==', true)
         .onSnapshot(snapshot => {
-          if (!snapshot.empty) setUnreadMessages(true);
-          else setUnreadMessages(false);
+          if (!snapshot.empty) {
+            setUnreadMessages(true);
+
+            snapshot.forEach(doc => {
+              const message = doc.data();
+
+              if (message.sent === false) {
+                PushNotification.localNotification({
+                  channelId: 'msg-ch',
+                  title: message.user.name,
+                  message: message.text,
+                  largeIconUrl: message.user.avatar,
+                });
+
+                const ref = doc.ref;
+
+                ref.update({
+                  sent: true,
+                });
+              }
+            });
+          } else setUnreadMessages(false);
         });
     } catch (err) {
       console.error(err);
@@ -49,12 +98,17 @@ const TabStackScreen = () => {
   };
 
   useEffect(() => {
+    createMessageNotificationChannel();
+
     let unsubscribe = null;
     (async () => {
       unsubscribe = await checkUnreadMessages();
     })();
 
-    return () => unsubscribe();
+    return () => {
+      deleteMessageNotificationChannel();
+      unsubscribe();
+    };
   }, []);
 
   return (

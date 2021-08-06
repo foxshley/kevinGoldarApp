@@ -119,6 +119,7 @@ export default function Messages({navigation}) {
               lastMessage: message.text,
               createdAt: message.createdAt.toDate(),
               unread: message.unread,
+              sent: message.sent,
             });
           });
 

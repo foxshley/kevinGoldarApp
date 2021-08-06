@@ -159,6 +159,7 @@ export default function MessagesChat({route, navigation}) {
             text: text,
             createdAt: createdAt,
             unread: false,
+            sent: true,
             user: {
               id: recipient.id,
               name: recipient.name,
@@ -176,6 +177,7 @@ export default function MessagesChat({route, navigation}) {
             text: text,
             createdAt: createdAt,
             unread: true,
+            sent: false,
             user: {
               id: sender.id,
               name: sender.name,
