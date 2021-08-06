@@ -15,8 +15,9 @@ import firestore from '@react-native-firebase/firestore';
 import MapScreen from './Map';
 import NavigationScreen from './Navigation';
 import MessagesScreen from './Messages';
-import MessagesChat from './MessagesChat';
+import MessagesChatScreen from './MessagesChat';
 import ProfileScreen from './Profile';
+import LogoutScreen from './Logout';
 
 const HomeStack = createStackNavigator();
 const TabStack = createBottomTabNavigator();
@@ -26,29 +27,34 @@ const styles = StyleSheet.create({});
 const TabStackScreen = () => {
   const [unreadMessages, setUnreadMessages] = useState(false);
 
-  useEffect(() => {
-    let snapshot = null;
-    (async () => {
-      const uid = auth().currentUser.uid;
+  const checkUnreadMessages = async () => {
+    const uid = auth().currentUser.uid;
+    let snapshotRef = null;
 
-      try {
-        snapshot = await firestore()
-          .collection('lastMessages')
-          .doc(uid)
-          .collection('messages')
-          .where('unread', '==', true)
-          .onSnapshot(snapshot => {
-            if (!snapshot.empty) setUnreadMessages(true);
-            else setUnreadMessages(false);
-          });
-      } catch (err) {
-        console.error(err);
-      }
+    try {
+      snapshotRef = await firestore()
+        .collection('lastMessages')
+        .doc(uid)
+        .collection('messages')
+        .where('unread', '==', true)
+        .onSnapshot(snapshot => {
+          if (!snapshot.empty) setUnreadMessages(true);
+          else setUnreadMessages(false);
+        });
+    } catch (err) {
+      console.error(err);
+    }
+
+    return snapshotRef;
+  };
+
+  useEffect(() => {
+    let unsubscribe = null;
+    (async () => {
+      unsubscribe = await checkUnreadMessages();
     })();
 
-    return () => {
-      if (snapshot) return snapshot;
-    };
+    return () => unsubscribe();
   }, []);
 
   return (
@@ -91,9 +97,10 @@ export default function Home() {
       <HomeStack.Screen name="Navigation" component={NavigationScreen} />
       <HomeStack.Screen
         name="MessagesChat"
-        component={MessagesChat}
+        component={MessagesChatScreen}
         options={{headerShown: true}}
       />
+      <HomeStack.Screen name="Logout" component={LogoutScreen} />
     </HomeStack.Navigator>
   );
 }

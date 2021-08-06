@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function Home() {
+export default function Home({navigation}) {
   const [name, setName] = useState('');
   const [photo, setPhoto] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -102,12 +102,8 @@ export default function Home() {
 
   const formMethods = useForm();
 
-  const {signOut} = useContext(AuthContext);
-
   const logout = () => {
-    auth()
-      .signOut()
-      .then(() => signOut());
+    navigation.navigate('Logout');
   };
 
   const setInitialData = () => {

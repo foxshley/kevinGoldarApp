@@ -35,60 +35,43 @@ export default function MessagesChat({route, navigation}) {
     return id1 < id2 ? id1 + id2 : id2 + id1;
   };
 
-  const fetchMessages = () => {
-    let snapshotSubscription = null;
-    (async () => {
-      const id1 = auth().currentUser.uid;
-      const id2 = route.params.recipientId;
+  const fetchMessages = async () => {
+    let snapshotRef = null;
+    const id1 = auth().currentUser.uid;
+    const id2 = route.params.recipientId;
 
-      const conversationId = getConversationId(id1, id2);
+    const conversationId = getConversationId(id1, id2);
 
-      try {
-        const personImgUrl = await storage()
-          .ref('avatar/person.png')
-          .getDownloadURL();
-        snapshotSubscription = await firestore()
-          .collection('chats')
-          .doc(conversationId)
-          .collection('messages')
-          .orderBy('createdAt', 'desc')
-          .onSnapshot(snapshot =>
-            setMessages(
-              snapshot.docs.map(doc => ({
-                _id: doc.data()._id,
-                text: doc.data().text,
-                createdAt: doc.data().createdAt.toDate(),
-                user: {
-                  _id: doc.data().user._id,
-                  name: doc.data().user.name,
-                  avatar: doc.data().user.avatar
-                    ? doc.data().user.avatar
-                    : personImgUrl,
-                },
-              })),
-            ),
-          );
-      } catch (err) {
-        console.error(err);
-      }
-    })();
+    try {
+      const personImgUrl = await storage()
+        .ref('avatar/person.png')
+        .getDownloadURL();
+      snapshotRef = await firestore()
+        .collection('chats')
+        .doc(conversationId)
+        .collection('messages')
+        .orderBy('createdAt', 'desc')
+        .onSnapshot(snapshot =>
+          setMessages(
+            snapshot.docs.map(doc => ({
+              _id: doc.data()._id,
+              text: doc.data().text,
+              createdAt: doc.data().createdAt.toDate(),
+              user: {
+                _id: doc.data().user._id,
+                name: doc.data().user.name,
+                avatar: doc.data().user.avatar
+                  ? doc.data().user.avatar
+                  : personImgUrl,
+              },
+            })),
+          ),
+        );
+    } catch (err) {
+      console.error(err);
+    }
 
-    return snapshotSubscription;
-
-    // const data = [
-    //   {
-    //     _id: 1,
-    //     text: 'Hello',
-    //     createdAt: new Date(),
-    //     user: {
-    //       _id: 2,
-    //       name: 'Sayed',
-    //       avatar: 'https://i.pravatar.cc/100?img=3',
-    //     },
-    //   },
-    // ];
-
-    // setMessages(data);
+    return snapshotRef;
   };
 
   const fetchSenderData = async () => {
@@ -206,19 +189,18 @@ export default function MessagesChat({route, navigation}) {
   };
 
   useLayoutEffect(() => {
+    let unsubscribe = null;
     (async () => {
       const senderData = await fetchSenderData();
       const recipientData = await fetchRecipientData();
 
       setSender(senderData);
       setRecipient(recipientData);
+
+      unsubscribe = await fetchMessages();
     })();
 
-    const unsubscribe = fetchMessages();
-
-    return () => {
-      if (unsubscribe) return unsubscribe;
-    };
+    return () => unsubscribe();
   }, []);
 
   useLayoutEffect(() => {

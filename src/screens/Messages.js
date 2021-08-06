@@ -97,61 +97,36 @@ const styles = StyleSheet.create({
 export default function Messages({navigation}) {
   const [lastMessages, setLastMessages] = useState([]);
 
-  const fetchLastMessages = () => {
+  const fetchLastMessages = async () => {
     const uid = auth().currentUser.uid;
+    let snapshotRef = null;
 
-    (async () => {
-      const snapshotRef = await firestore()
-        .collection('lastMessages')
-        .doc(uid)
-        .collection('messages')
-        .orderBy('createdAt', 'desc')
-        .onSnapshot(snapshot => {
-          if (!snapshot.empty) {
-            const data = [];
-            snapshot.forEach(docSnapshot => {
-              let message = docSnapshot.data();
+    snapshotRef = await firestore()
+      .collection('lastMessages')
+      .doc(uid)
+      .collection('messages')
+      .orderBy('createdAt', 'desc')
+      .onSnapshot(snapshot => {
+        if (!snapshot.empty) {
+          const data = [];
+          snapshot.forEach(docSnapshot => {
+            let message = docSnapshot.data();
 
-              data.push({
-                id: message.user.id,
-                avatarUrl: message.user.avatar,
-                name: message.user.name,
-                lastMessage: message.text,
-                createdAt: message.createdAt.toDate(),
-                unread: message.unread,
-              });
+            data.push({
+              id: message.user.id,
+              avatarUrl: message.user.avatar,
+              name: message.user.name,
+              lastMessage: message.text,
+              createdAt: message.createdAt.toDate(),
+              unread: message.unread,
             });
+          });
 
-            setLastMessages(data);
-          }
-        });
-    })();
+          setLastMessages(data);
+        }
+      });
 
-    // const data = [
-    //   {
-    //     id: 1,
-    //     avatarUrl: 'https://i.pravatar.cc/100?img=1',
-    //     name: 'Julian',
-    //     lastMessage: 'Incididunt consequat qui elit et.',
-    //     dateTime: '2012-01-26T13:51:50.417-07:00',
-    //   },
-    //   {
-    //     id: 2,
-    //     avatarUrl: 'https://i.pravatar.cc/100?img=2',
-    //     name: 'Gilbert',
-    //     lastMessage: 'Reprehenderit commodo ea magna ut adipisicing sint.',
-    //     dateTime: '2012-01-26T13:51:50.417-07:00',
-    //   },
-    //   {
-    //     id: 3,
-    //     avatarUrl: 'https://i.pravatar.cc/100?img=3',
-    //     name: 'Matthew',
-    //     lastMessage:
-    //       'Incididunt ullamco duis cupidatat occaecat labore exercitation fugiat do nisi dolore sit.',
-    //     dateTime: '2021-07-29T13:51:50.417-07:00',
-    //   },
-    // ];
-    // setLastMessages(data);
+    return snapshotRef;
   };
 
   const onMessagePressed = id => {
@@ -170,7 +145,12 @@ export default function Messages({navigation}) {
   };
 
   useLayoutEffect(() => {
-    fetchLastMessages();
+    let unsubscribe = null;
+    (async () => {
+      unsubscribe = await fetchLastMessages();
+    })();
+
+    return () => unsubscribe();
   }, []);
 
   const MessageItem = ({item}) => (
