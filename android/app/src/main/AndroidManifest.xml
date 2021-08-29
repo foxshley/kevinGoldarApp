@@ -14,7 +14,7 @@
       android:theme="@style/AppTheme"
       android:largeHeap="true"
       android:usesCleartextTraffic="true">
-      <meta-data android:name="MAPBOX_ACCESS_TOKEN" android:value="pk.eyJ1IjoiZm94c2hsZXkiLCJhIjoiY2twcXRsdWZmMDN0dDJyczFnZXV0ZnEzNyJ9.qlPjomCcSOlj2O8C_S03bg" />
+      <meta-data android:name="MAPBOX_ACCESS_TOKEN" android:value="pk.eyJ1Ijoic2h1a3VtZWkiLCJhIjoiY2tzdmd5M2ZrMDk5NjJwbHE1bTVsNm50dSJ9.zP2K1wpqTMInYrdGeXp1GQ" />
       <activity
         android:name=".MainActivity"
         android:label="@string/app_name"

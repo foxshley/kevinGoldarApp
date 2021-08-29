@@ -7,8 +7,8 @@ import React, {useState, useEffect} from 'react';
 import {View, Text, StyleSheet, ActivityIndicator} from 'react-native';
 import MapboxGL from '@react-native-mapbox-gl/maps';
 import Geolocation from '@react-native-community/geolocation';
+import {MAPBOX_ACCESS_TOKEN} from '../constants';
 
-import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 
 import {geohashQueryBounds, distanceBetween} from 'geofire-common';
@@ -24,9 +24,7 @@ import bloodBMinusIcon from '../assets/b-minus.png';
 import bloodABMinusIcon from '../assets/ab-minus.png';
 import bloodOMinusIcon from '../assets/o-minus.png';
 
-MapboxGL.setAccessToken(
-  'pk.eyJ1IjoiZm94c2hsZXkiLCJhIjoiY2twcXRsdWZmMDN0dDJyczFnZXV0ZnEzNyJ9.qlPjomCcSOlj2O8C_S03bg',
-);
+MapboxGL.setAccessToken(MAPBOX_ACCESS_TOKEN);
 
 const styles = StyleSheet.create({
   map: {

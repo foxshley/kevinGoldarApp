@@ -138,11 +138,11 @@ export default function Login({navigation}) {
           }}
         />
       </FormProvider>
-      <Pressable
+      {/* <Pressable
         style={{marginLeft: 'auto', marginBottom: 20}}
         onPress={onForgotPasswordPressed}>
         <Text style={{color: '#FF5858'}}>Lupa Password?</Text>
-      </Pressable>
+      </Pressable> */}
       <TouchableOpacity
         style={styles.btnLogin}
         onPress={formMethods.handleSubmit(onLoginPressed, onLoginError)}

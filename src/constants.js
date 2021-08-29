@@ -1,5 +1,6 @@
-const ENDPOINT = 'https://localhost:3000'
-const LOGIN_ENDPOINT = ENDPOINT + '/login'
-const REGISTER_ENDPOINT = ENDPOINT + '/register'
+const MAPBOX_ACCESS_TOKEN =
+  'pk.eyJ1Ijoic2h1a3VtZWkiLCJhIjoiY2tzdmd5M2ZrMDk5NjJwbHE1bTVsNm50dSJ9.zP2K1wpqTMInYrdGeXp1GQ';
+const MAPBOX_SECRET_TOKEN =
+  'sk.eyJ1Ijoic2h1a3VtZWkiLCJhIjoiY2tzdmg0MHg2MHZ6ZDMxbHMyeXhsanpjeCJ9.B0SA-9078kSNBms-vuAsAA';
 
-export default { ENDPOINT, LOGIN_ENDPOINT, REGISTER_ENDPOINT };
+export default {MAPBOX_ACCESS_TOKEN, MAPBOX_SECRET_TOKEN};

@@ -6,6 +6,7 @@
 import React, {useState, useEffect} from 'react';
 import {FormProvider, useForm} from 'react-hook-form';
 import MapboxGL from '@react-native-mapbox-gl/maps';
+import {MAPBOX_ACCESS_TOKEN} from '../constants';
 
 import {
   Text,
@@ -22,9 +23,7 @@ import {geohashForLocation} from 'geofire-common';
 import Container from '../components/Container';
 import FormInputField from '../components/FormInputField';
 
-MapboxGL.setAccessToken(
-  'pk.eyJ1IjoiZm94c2hsZXkiLCJhIjoiY2twcXRsdWZmMDN0dDJyczFnZXV0ZnEzNyJ9.qlPjomCcSOlj2O8C_S03bg',
-);
+MapboxGL.setAccessToken(MAPBOX_ACCESS_TOKEN);
 
 const styles = StyleSheet.create({
   map: {

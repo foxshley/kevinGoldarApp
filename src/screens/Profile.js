@@ -16,22 +16,18 @@ import {
 import {FormProvider, useForm} from 'react-hook-form';
 import {geohashForLocation} from 'geofire-common';
 import MapboxGL from '@react-native-mapbox-gl/maps';
+import {MAPBOX_ACCESS_TOKEN} from '../constants';
 
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 
 import PersonImg from '../assets/person.png';
 
-import Container from '../components/Container';
 import CheckBox from '@react-native-community/checkbox';
 import FormInputField from '../components/FormInputField';
 import FormBloodTypePicker from '../components/FormBloodTypePicker';
 
-import AuthContext from '../contexts/AuthContext';
-
-MapboxGL.setAccessToken(
-  'pk.eyJ1IjoiZm94c2hsZXkiLCJhIjoiY2twcXRsdWZmMDN0dDJyczFnZXV0ZnEzNyJ9.qlPjomCcSOlj2O8C_S03bg',
-);
+MapboxGL.setAccessToken(MAPBOX_ACCESS_TOKEN);
 
 const styles = StyleSheet.create({
   container: {
