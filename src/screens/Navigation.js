@@ -13,7 +13,6 @@ export default function Navigation({navigation}) {
       <MapboxNavigation
         origin={origin}
         destination={destination}
-        shouldSimulateRoute={true}
         showsEndOfRouteFeedback={true}
         onCancelNavigation={() => navigation.goBack()}
         onArrive={() => {
