@@ -1,6 +1,6 @@
-# Cari Darah
+# Donor Darah Online
 
-Cari Darah adalah sebuah aplikasi yang dapat digunakan untuk mencari darah dengan cara menjembatani antara donor darah dan pencari darah.
+Donor Darah Online adalah sebuah aplikasi yang dapat digunakan untuk mencari darah dengan cara menjembatani antara donor darah dan pencari darah.
 
 ## Teknologi yang digunakan
 
@@ -14,4 +14,8 @@ Cari Darah adalah sebuah aplikasi yang dapat digunakan untuk mencari darah denga
 
 ## Run
 
-    yarn start
+# Android
+    yarn android
+
+# iOS
+    yarn ios

@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "kevinGoldarApp.app"
-               BlueprintName = "kevinGoldarApp"
-               ReferencedContainer = "container:kevinGoldarApp.xcodeproj">
+               BuildableName = "DonorDarahOnline.app"
+               BlueprintName = "DonorDarahOnline"
+               ReferencedContainer = "container:DonorDarahOnline.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "kevinGoldarAppTests.xctest"
-               BlueprintName = "kevinGoldarAppTests"
-               ReferencedContainer = "container:kevinGoldarApp.xcodeproj">
+               BuildableName = "DonorDarahOnlineTests.xctest"
+               BlueprintName = "DonorDarahOnlineTests"
+               ReferencedContainer = "container:DonorDarahOnline.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "kevinGoldarApp.app"
-            BlueprintName = "kevinGoldarApp"
-            ReferencedContainer = "container:kevinGoldarApp.xcodeproj">
+            BuildableName = "DonorDarahOnline.app"
+            BlueprintName = "DonorDarahOnline"
+            ReferencedContainer = "container:DonorDarahOnline.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "kevinGoldarApp.app"
-            BlueprintName = "kevinGoldarApp"
-            ReferencedContainer = "container:kevinGoldarApp.xcodeproj">
+            BuildableName = "DonorDarahOnline.app"
+            BlueprintName = "DonorDarahOnline"
+            ReferencedContainer = "container:DonorDarahOnline.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
