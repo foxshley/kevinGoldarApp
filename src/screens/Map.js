@@ -14,6 +14,7 @@ import firestore from '@react-native-firebase/firestore';
 import {geohashQueryBounds, distanceBetween} from 'geofire-common';
 
 import DonorCalloutView from '../components/DonorCalloutView';
+import BloodTypePicker from '../components/BloodTypePicker';
 
 import bloodAPlusIcon from '../assets/a-plus.png';
 import bloodBPlusIcon from '../assets/b-plus.png';
@@ -37,6 +38,16 @@ const styles = StyleSheet.create({
     padding: 20,
     zIndex: 99,
   },
+  bloodTypePicker: {
+    position: 'absolute',
+    height: 50,
+    top: 20, 
+    left: 0, 
+    right: 0, 
+    bottom: 0, 
+    alignItems: 'center',
+    zIndex: 99
+  }
 });
 
 const symbolStyles = {
@@ -96,10 +107,16 @@ export default function Map({navigation}) {
     features: [],
   });
   const [selectedDonor, setSelectedDonor] = useState();
+  const [selectedBloodType, setSelectedBloodType] = useState("");
   const [currentPos, setCurrentPos] = useState([]);
   const [isDataFetched, setIsDataFetched] = useState(false);
   const [watchPosID, setWatchPosID] = useState(null);
 
+  const onBloodTypePickerChange = form => {
+    fetchDonors(form.bloodType)
+  };
+
+  const onBloodTypePickerChangeError = form => {};
   const getBloodTypeIcon = bloodType => {
     switch (bloodType) {
       case 'A+':
@@ -125,7 +142,9 @@ export default function Map({navigation}) {
     return null;
   };
 
-  const fetchDonors = async () => {
+  const fetchDonors = async (bloodType) => {
+    setIsDataFetched(false);
+
     // Find cities within 50km of London
     const center = [...currentPos].reverse();
     const radiusInM = 25 * 1000;
@@ -137,15 +156,30 @@ export default function Map({navigation}) {
 
     const snapshots = [];
 
-    for (const b of bounds) {
-      const q = firestore()
-        .collection('users')
-        .where('geodata.active', '==', true)
-        .orderBy('geodata.geohash')
-        .startAt(b[0])
-        .endAt(b[1]);
-
-      snapshots.push(q.get());
+    if(bloodType !== undefined) {
+      for (const b of bounds) {
+        const q = firestore()
+          .collection('users')
+          .where('geodata.active', '==', true)
+          .where('bloodType', '==', bloodType)
+          .orderBy('geodata.geohash')
+          .startAt(b[0])
+          .endAt(b[1]);
+  
+        snapshots.push(q.get());
+      }
+    }
+    else {
+      for (const b of bounds) {
+        const q = firestore()
+          .collection('users')
+          .where('geodata.active', '==', true)
+          .orderBy('geodata.geohash')
+          .startAt(b[0])
+          .endAt(b[1]);
+  
+        snapshots.push(q.get());
+      }
     }
 
     Promise.all(snapshots).then(snaps => {
@@ -226,6 +260,12 @@ export default function Map({navigation}) {
     }
   }, [currentPos]);
 
+  useEffect(() => {
+    if (!(selectedBloodType === "")) {
+      fetchDonors(selectedBloodType);
+    }
+  }, [selectedBloodType]);
+
   return (
     <View style={{flex: 1}}>
       {!isDataFetched && (
@@ -235,6 +275,14 @@ export default function Map({navigation}) {
           color="#0000ff"
         />
       )}
+      <View style={styles.bloodTypePicker}>
+        <BloodTypePicker 
+          selectedValue={selectedBloodType}
+          onValueChange={(itemValue, itemIndex) =>
+            setSelectedBloodType(itemValue)
+          }
+        />      
+      </View>
       <MapboxGL.MapView
         style={styles.map}
         styleURL={MapboxGL.StyleURL.Street}
